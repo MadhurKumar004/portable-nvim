@@ -21,6 +21,16 @@ if [ ! -x "$ROOT/bin/clangd" ]; then
   chmod 755 "$ROOT/bin/clangd"
 fi
 
+if [ ! -x "$ROOT/bin/rg" ]; then
+  echo "Bootstrapping ripgrep into $ROOT/bin..."
+  TMP="$(mktemp -d)"
+  trap 'rm -rf "$TMP"' EXIT
+  curl -fL --retry 3 "https://github.com/BurntSushi/ripgrep/releases/download/14.1.1/ripgrep-14.1.1-x86_64-unknown-linux-musl.tar.gz" -o "$TMP/rg.tar.gz"
+  tar -xzf "$TMP/rg.tar.gz" -C "$TMP" --strip-components=1
+  cp "$TMP/rg" "$ROOT/bin/rg"
+  chmod 755 "$ROOT/bin/rg"
+fi
+
 export XDG_CONFIG_HOME="$ROOT/config"
 export XDG_DATA_HOME="$ROOT/data"
 export XDG_STATE_HOME="$ROOT/state"

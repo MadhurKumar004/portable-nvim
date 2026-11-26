@@ -52,6 +52,22 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
   {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local builtin = require("telescope.builtin")
+      require("telescope").setup({
+        defaults = {
+          file_ignore_patterns = { "^%.git/", "^portable%-nvim/", "%.o$", "%.a$" },
+        },
+      })
+      vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Find files by name" })
+      vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Search text inside files" })
+      vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Switch open buffers" })
+      vim.keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Find symbols in file" })
+    end,
+  },
+  {
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
