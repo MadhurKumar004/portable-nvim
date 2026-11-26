@@ -2,13 +2,42 @@ vim.g.mapleader = " "
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- Core options
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.hidden = true
 vim.opt.swapfile = false
+vim.opt.undofile = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 vim.opt.ttimeoutlen = 1
 vim.opt.encoding = "utf-8"
 vim.opt.termguicolors = true
+
+-- Remote-to-local clipboard over SSH / tmux via OSC 52
+if vim.env.SSH_TTY then
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+end
+vim.opt.clipboard = "unnamedplus"
+
+-- Ergonomic navigation & editing keymaps
+vim.keymap.set("i", "jk", "<Esc>", { desc = "Exit insert mode" })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Focus left window" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Focus lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Focus upper window" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Focus right window" })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half-page down centered" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half-page up centered" })
 
 -- Bootstrap lazy.nvim inside portable-nvim/data/nvim/lazy
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
@@ -57,6 +86,7 @@ vim.api.nvim_create_user_command("TrimWhitespace", function()
   vim.fn.winrestview(view)
 end, {})
 
+-- Clangd LSP
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "c", "cpp", "objc", "objcpp" },
   callback = function(args)
