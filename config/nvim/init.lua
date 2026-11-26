@@ -1,9 +1,54 @@
+vim.g.mapleader = " "
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.hidden = true
 vim.opt.swapfile = false
 vim.opt.ttimeoutlen = 1
 vim.opt.encoding = "utf-8"
+vim.opt.termguicolors = true
+
+-- Bootstrap lazy.nvim inside portable-nvim/data/nvim/lazy
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.uv.fs_stat(lazypath) then
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup({
+  {
+    "nvim-tree/nvim-tree.lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("nvim-tree").setup({
+        view = { width = 34 },
+        update_focused_file = { enable = true },
+        filters = { dotfiles = false },
+      })
+      vim.keymap.set("n", "<leader>s", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle file tree" })
+      vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle file tree" })
+    end,
+  },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "master",
+    build = ":TSUpdate",
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        ensure_installed = { "c", "cpp", "lua", "vim", "vimdoc", "bash", "python" },
+        auto_install = false,
+        highlight = { enable = true },
+        indent = { enable = true },
+      })
+    end,
+  },
+})
 
 vim.api.nvim_create_user_command("TrimWhitespace", function()
   local view = vim.fn.winsaveview()
