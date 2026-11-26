@@ -30,6 +30,7 @@ require("lazy").setup({
         view = { width = 34 },
         update_focused_file = { enable = true },
         filters = { dotfiles = false },
+        git = { enable = false },
       })
       vim.keymap.set("n", "<leader>s", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle file tree" })
       vim.keymap.set("n", "<C-n>", ":NvimTreeToggle<CR>", { silent = true, desc = "Toggle file tree" })
