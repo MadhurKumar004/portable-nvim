@@ -6,19 +6,19 @@ mkdir -p "$ROOT/bin" "$ROOT/data" "$ROOT/state" "$ROOT/cache"
 if [ ! -x "$ROOT/bin/nvim" ]; then
   echo "Bootstrapping portable Neovim into $ROOT..."
   TMP="$(mktemp -d)"
-  curl -fL "https://github.com/neovim/neovim-releases/releases/latest/download/nvim-linux-x86_64.tar.gz" -o "$TMP/nvim.tar.gz"
+  trap 'rm -rf "$TMP"' EXIT
+  curl -fL --retry 3 "https://github.com/neovim/neovim-releases/releases/latest/download/nvim-linux-x86_64.tar.gz" -o "$TMP/nvim.tar.gz"
   tar -xzf "$TMP/nvim.tar.gz" -C "$ROOT" --strip-components=1
-  rm -rf "$TMP"
 fi
 
 if [ ! -x "$ROOT/bin/clangd" ]; then
   echo "Bootstrapping clangd 23.1.0 into $ROOT/bin..."
   TMP="$(mktemp -d)"
-  curl -fL "https://github.com/clangd/clangd/releases/download/23.1.0/clangd-linux-23.1.0.zip" -o "$TMP/clangd.zip"
-  unzip -q "$TMP/clangd.zip" -d "$TMP"
+  trap 'rm -rf "$TMP"' EXIT
+  curl -fL --retry 3 "https://github.com/clangd/clangd/releases/download/23.1.0/clangd-linux-23.1.0.zip" -o "$TMP/clangd.zip"
+  python3 -m zipfile -e "$TMP/clangd.zip" "$TMP"
   cp "$TMP"/clangd_*/bin/clangd "$ROOT/bin/clangd"
   chmod 755 "$ROOT/bin/clangd"
-  rm -rf "$TMP"
 fi
 
 export XDG_CONFIG_HOME="$ROOT/config"
